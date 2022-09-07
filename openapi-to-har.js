@@ -476,6 +476,7 @@ const getParameterValues = function (openApi, param, location, values) {
  * @param  {Object} parameters Objects described in the document to parse into the query string
  * @param  {string} location   One of `path`, `query`, `header` or `cookie`
  * @param  {Object} values     Optional: query parameter values to use in the snippet if present
+ * @param  {Boolean} addOptionalQueryParameters Optional: determine whether optional query parameters should be appended to the url
  * @return {Object.<string, HarParameterObject[]>} Object describing the parameters for a method or path.
  * Each key in the return object will have at least one entry it's is value array. But exploded values
  * in query parameters may have more than one.
@@ -484,7 +485,8 @@ const parseParametersToQuery = function (
   openApi,
   parameters,
   location,
-  values
+  values,
+  addOptionalQueryParameters
 ) {
   /** @type {Object.<string, HarParameterObject[]>} */
   const queryStrings = {};
@@ -506,18 +508,33 @@ const parseParametersToQuery = function (
         }
       }
     }
+    // param.name is a safe key, because the spec defines
+    // that name MUST be unique
     if (
       typeof param.in !== 'undefined' &&
       param.in.toLowerCase() === location
     ) {
-      // param.name is a safe key, because the spec defines
-      // that name MUST be unique
-      queryStrings[param.name] = getParameterValues(
-        openApi,
-        param,
-        location,
-        values
-      );
+      if (param.in.toLowerCase() === 'query') {
+        //If it is query parameters, 
+        //only required parameters should be appended to the url
+        //or the path object should contain x-add-optional-query-parameters
+
+        if (param.required === true || addOptionalQueryParameters) {
+          queryStrings[param.name] = getParameterValues(
+            openApi,
+            param,
+            location,
+            values
+          );
+        }
+      } else {
+        queryStrings[param.name] = getParameterValues(
+          openApi,
+          param,
+          location,
+          values
+        );
+      }
     }
   }
 
@@ -562,7 +579,8 @@ const getParameterCollectionIn = function (
       openApi,
       openApi.paths[path].parameters,
       location,
-      values
+      values,
+      openApi.paths[path]['x-add-optional-query-parameters']
     );
   }
 
@@ -571,7 +589,8 @@ const getParameterCollectionIn = function (
       openApi,
       openApi.paths[path][method].parameters,
       location,
-      values
+      values,
+      openApi.paths[path]['x-add-optional-query-parameters']
     );
   }
 
@@ -669,6 +688,7 @@ const getHeadersArray = function (openApi, path, method) {
   let basicAuthDef;
   let apiKeyAuthDef;
   let oauthDef;
+  let authorizationExample;
   if (typeof pathObj.security !== 'undefined') {
     for (var l in pathObj.security) {
       const secScheme = Object.keys(pathObj.security[l])[0];
@@ -693,6 +713,7 @@ const getHeadersArray = function (openApi, path, method) {
           break;
         case 'oauth2':
           oauthDef = secScheme;
+          authorizationExample = secDefinition['x-authorization-example'];
           break;
         case 'http':
           switch (authScheme) {
@@ -739,6 +760,7 @@ const getHeadersArray = function (openApi, path, method) {
           break;
         case 'oauth2':
           oauthDef = secScheme;
+          authorizationExample = secDefinition['x-authorization-example'];
           break;
       }
     }
@@ -755,9 +777,10 @@ const getHeadersArray = function (openApi, path, method) {
       value: 'REPLACE_KEY_VALUE',
     });
   } else if (oauthDef) {
+    let value = authorizationExample || 'Bearer ' + 'REPLACE_BEARER_TOKEN';
     headers.push({
       name: 'Authorization',
-      value: 'Bearer ' + 'REPLACE_BEARER_TOKEN',
+      value,
     });
   }
 

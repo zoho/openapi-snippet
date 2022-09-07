@@ -1,10 +1,10 @@
 {
-  "name": "openapi-snippet",
-  "version": "0.14.0",
+  "name": "@zoho/openapi-snippet",
+  "version": "1.0.0",
   "description": "Generates code snippets from Open API (previously Swagger) documents.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ErikWittern/openapi-snippet"
+    "url": "https://github.com/zoho/openapi-snippet"
   },
   "keywords": [
     "HTTP",
@@ -12,7 +12,7 @@
     "OpenAPI Specification",
     "Swagger"
   ],
-  "author": "Erik Wittern",
+  "author": "Zoho",
   "license": "MIT",
   "main": "index.js",
   "scripts": {

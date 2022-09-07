@@ -287,7 +287,7 @@ test('Query Params Defined for all methods should be resolved', function (t) {
     ['node_request']
   );
   const snippet = result.snippets[0].content;
-  t.true(/ {tags: 'dog,cat', limit: '10'}/.test(snippet));
+  t.true(/ {tags: 'dog,cat', limit: '10', length: '12'}/.test(snippet));
   t.false(/SOME_INTEGER_VALUE/.test(snippet));
   t.end();
 });
@@ -1712,5 +1712,18 @@ test('A reference in an examples object is resolved', function (t) {
 
   const snippet = result.snippets[0].content;
   t.match(snippet, /tags=dog%2Ccat/);
+  t.end();
+});
+
+test('Testing only query parameters are parsed if it is required or the path object has x-add-optional-query-parameters', function (t) {
+  t.plan(1);
+  const result = OpenAPISnippets.getEndpointSnippets(
+    ParameterExampleReferenceAPI,
+    '/animals',
+    'get',
+    ['node_request']
+  );
+  const snippet = result.snippets[0].content;
+  t.true(/ {tags: 'dog,cat', limit: '10', length: '12'}/.test(snippet));
   t.end();
 });

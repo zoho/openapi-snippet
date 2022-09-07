@@ -208,6 +208,16 @@ const getSnippetsForTargets = function (targets, snippet, mimeType) {
   return snippets;
 };
 
+/**
+ * Add custom language taget in httpsnippet
+ * This method extends httpsnippet's addTarget method
+ * @param customLanguageTarget {module}      
+ */
+
+const addTarget = function (customLanguageTarget) {
+  HTTPSnippet.addTarget(customLanguageTarget);
+}
+
 const capitalizeFirstLetter = function (string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
@@ -215,6 +225,7 @@ const capitalizeFirstLetter = function (string) {
 module.exports = {
   getSnippets,
   getEndpointSnippets,
+  addTarget
 };
 
 // The if is only for when this is run from the browser

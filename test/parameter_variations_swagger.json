@@ -30,6 +30,7 @@
                         "name": "id",
                         "in": "query",
                         "explode": false,
+                        "required": true,
                         "example": {
                             "role": "admin",
                             "firstName": "Alex",
@@ -195,7 +196,7 @@
                     "name": "tags",
                     "in": "query",
                     "description": "tags to filter by",
-                    "required": false,
+                    "required": true,
                     "style": "form",
                     "explode": false,
                     "examples": {
